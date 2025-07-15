@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Блог{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/post_list.css' %}">
+<div class="container">
+    <h1>Блог</h1>
+
+    <div class="category-list">
+        <h2>Категории</h2>
+        <ul>
+            <li><a href="{% url 'blog:post_list' %}">Все категории</a></li>
+            {% for category in categories %}
+                <li><a href="{% url 'blog:post_list_by_category' category.slug %}">{{ category.name }}</a></li>  <!-- ИСПОЛЬЗУЕМ post_list_by_category -->
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if posts %}
+    <ul class="post-list">
+        {% for post in posts %}
+            <li>
+                <h2>
+                    <a href="{% url 'blog:post_detail' post.publish.year post.publish.month post.publish.day post.slug %}">{{ post.title }}</a>
+                </h2>
+                <p>Опубликовано: {{ post.publish|date:"d.m.Y" }} автором {{ post.author }}</p>
+                <p>{{ post.body|truncatewords:30 }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>Пока нет постов.</p>
+    {% endif %}
+</div>
+{% endblock %}

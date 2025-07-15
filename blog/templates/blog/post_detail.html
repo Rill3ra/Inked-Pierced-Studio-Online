@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
+    <div class="container post-detail">
+        <h1>{{ post.title }}</h1>
+        <p>Опубликовано: {{ post.publish|date:"d.m.Y" }} автором {{ post.author }}</p>
+        <p>Категория: {{ post.category }}</p>
+        <div class="post-body">
+            {{ post.body|safe }}  <!-- Важно: отображаем HTML напрямую (если нужно) -->
+        </div>
+
+        <h2>Комментарии</h2>
+        {% if comments %}
+            {% for comment in comments %}
+                <div class="comment">
+                    <p><strong>{{ comment.name }}</strong> ({{ comment.created|date:"d.m.Y H:i" }}):</p>
+                    <p>{{ comment.body }}</p>
+                </div>
+            {% empty %}
+            <p>Комментариев пока нет.</p>
+        {% endfor %}
+        {% endif %}
+
+        <h2>Добавить комментарий</h2>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" class="comment-form">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit">Добавить комментарий</button>
+        </form>
+    </div>
+{% endblock %}
