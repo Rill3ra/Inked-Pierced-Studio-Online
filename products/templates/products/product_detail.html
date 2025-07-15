@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+
+    <div class="product-detail-container">
+        <div class="product-image-container">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail-image">
+            {% else %}
+                <img src="" alt="No image" class="product-detail-image">
+            {% endif %}
+        </div>
+
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+            <p class="product-description">{{ product.description|safe }}</p>
+            <p class="product-price">${{ product.price|floatformat:2 }}</p>
+            <p class="product-availability">
+                {% if product.is_available %}
+                    <span class="in-stock">В наличии</span>
+                {% else %}
+                    <span class="out-of-stock">Нет в наличии</span>
+                {% endif %}
+            </p>
+
+            <!-- Отображение характеристик -->
+            {% if product.material %}
+                <p>Материал: {{ product.get_material_display }}</p>
+            {% endif %}
+            {% if product.style %}
+                <p>Стиль: {{ product.get_style_display }}</p>
+            {% endif %}
+            {% if product.size %}
+                <p>Размер: {{ product.size }}</p>
+            {% endif %}
+            {% if product.is_exclusive %}
+                <p class="exclusive">Эксклюзив от дизайнера</p>
+            {% endif %}
+
+
+            <form method="post" action="{% url 'cart:cart_add' product.id %}">
+            {% csrf_token %}
+                <label for="quantity">Количество:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1">
+                <button type="submit">Добавить в корзину</button>
+            </form>
+
+            <a href="{% url 'products:product_list_by_category' category_slug=product.category.slug %}" class="back-to-category">Вернуться в категорию</a>
+        </div>
+    </div>
+{% endblock %}

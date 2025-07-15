@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if category %}{{ category.name }}{% else %}Продукты{% endif %}{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/product_list.css' %}">
+
+    <div class="products-container">
+        <h1>{% if category %}{{ category.name }}{% else %}Продукты{% endif %}</h1>
+
+        <form method="get" action="{% url 'products:product_search' %}">
+            <input type="text" name="q" placeholder="Поиск товаров..." value="{{ query }}" class="search-input">
+            <button type="submit" class="search-button">Поиск</button>
+        </form>
+
+        {% if query %}
+            <h2>Результаты для "{{ query }}"</h2>
+        {% endif %}
+
+        <div class="category-list">
+            <h2>Категории</h2>
+            <ul>
+                <li><a href="{% url 'products:product_list' %}">Все</a></li>
+                {% for category in categories %}
+                    <li><a href="{% url 'products:product_list_by_category' category_slug=category.slug %}">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if category and category.children.all %}
+            <div class="subcategory-list">
+                <h2>Подкатегории</h2>
+                <ul>
+                    {% for subcategory in category.children.all %}
+                        <li><a href="{% url 'products:product_list_by_category' category_slug=subcategory.slug %}">{{ subcategory.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Фильтры -->
+        <div class="filter-section">
+            <h2>Фильтры</h2>
+            <form method="get" action="{% if category %}{% url 'products:product_list_by_category' category_slug=category.slug %}{% else %}{% url 'products:product_list' %}{% endif %}">
+                <div class="filter-group">
+                    <label for="material">Материал:</label>
+                    <select name="material" id="material">
+                        <option value="">Все</option>
+                        {% for material_choice in Product.MATERIAL_CHOICES %}
+                            <option value="{{ material_choice.0 }}" {% if request.GET.material == material_choice.0 %}selected{% endif %}>{{ material_choice.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="style">Стиль:</label>
+                    <select name="style" id="style">
+                        <option value="">Все</option>
+                        {% for style_choice in Product.STYLE_CHOICES %}
+                            <option value="{{ style_choice.0 }}" {% if request.GET.style == style_choice.0 %}selected{% endif %}>{{ style_choice.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit">Применить фильтры</button>
+            </form>
+        </div>
+
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    {% if product.created_at|timesince < "30 days" %}
+                        <span class="new-product">Новинка</span>
+                    {% endif %}
+                    <a href="{% url 'products:product_detail' category_slug=product.category.slug product_slug=product.slug %}">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <img src="{{ product.image.url }}" alt="No image" class="product-image">
+                        {% endif %}
+                        <h3>{{ product.name }}</h3>
+                    </a>
+                    <p class="product-price">{{ product.price|floatformat:2 }}</p>
+                    <p class="product-availability">
+                        {% if product.is_available %}
+                            <span class="in-stock">В наличии</span>
+                        {% else %}
+                            <span class="out-of-stock">Нет в наличии</span>
+                        {% endif %}
+                    </p>
+                    {% if product.is_exclusive %}
+                        <p class="exclusive">Эксклюзив от дизайнера</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>Товары {% if category %} в этой категории {% endif %} еще не добавлены.</p>
+            {% endfor %}
+        </div>
+
+        {% if not category %}
+            <div class="certificate-section">
+                <h2>Подарочные сертификаты</h2>
+                <div class="certificate-grid">
+                    {% for certificate in certificates %}
+                        <div class="certificate-card">
+                            <a href="{% url 'products:certificate_detail' certificate_id=certificate.id %}">
+                                {% if certificate.image %}
+                                    <img src="{{ certificate.image.url }}" alt="{{ certificate.name }}" class="certificate-image">
+                                {% else %}
+                                    <img src="{{ certificate.image.url }}" alt="No image" class="certificate-image">
+                                {% endif %}
+                                <div class="certificate_text">
+                                    <h3 class="certificate_text">{{ certificate.name }}</h3>
+                                    <p class="certificate_text">{{ certificate.description }}</p>
+                                    <p class="certificate_text">Цена: ${{ certificate.price|floatformat:2 }}</p>
+                                    <p class="certificate_text">Действителен: {{ certificate.valid_days }} дней</p>
+                                </div>
+                            </a>
+                        </div>
+                    {% empty %}
+                        <p>Подарочные сертификаты отсутствуют.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

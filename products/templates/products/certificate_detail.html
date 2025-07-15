@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ certificate.name }}{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/certificate_detail.css' %}">
+
+    <div class="certificate-detail-container">
+        <div class="certificate-info">
+            <h1>{{ certificate.name }}</h1>
+            <p class="certificate-description">{{ certificate.description }}</p>
+            <p class="certificate-price">${{ certificate.price|floatformat:2 }}</p>
+            <p class="certificate-valid-days">Срок действия: {{ certificate.valid_days }} дней</p>
+
+            {% if certificate.image %}
+                <img src="{{ certificate.image.url }}" alt="{{ certificate.name }}" class="certificate-image">
+            {% endif %}
+
+            <form method="post" action="{% url 'cart:cart_add_certificate' certificate.id %}">
+                {% csrf_token %}
+                <label for="quantity">Количество:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1">
+                <button type="submit" class="add-to-cart-button">Добавить в корзину</button>
+            </form>
+
+            <a href="{% url 'products:product_list' %}" class="back-to-list">Вернуться к списку товаров</a>
+        </div>
+    </div>
+{% endblock %}
