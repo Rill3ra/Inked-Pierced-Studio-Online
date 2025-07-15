@@ -1,0 +1,80 @@
+/* static/css/certificate_detail.css */
+
+.certificate-detail-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.certificate-info {
+    text-align: center;
+}
+
+.certificate-info h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.certificate-description {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.certificate-price {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #4CAF50; /* Green */
+    margin-bottom: 10px;
+}
+
+.certificate-valid-days {
+    font-size: 1em;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.certificate-image {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.add-to-cart-button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1em;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.add-to-cart-button:hover {
+    background-color: #3e8e41;
+}
+
+.back-to-list {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff; /* Blue */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.back-to-list:hover {
+    background-color: #0056b3;
+}

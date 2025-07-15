@@ -1,0 +1,125 @@
+/* cart/cart_detail.css */
+
+/* Общие стили для корзины */
+.cart {
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+/* Стили для заголовка */
+.cart h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Стили для таблицы */
+.cart .table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.cart .table thead th {
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  border: none;
+  padding: 12px;
+}
+
+.cart .table tbody td {
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  padding: 10px;
+}
+
+.cart .table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Стили для изображений */
+.cart .table img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: white;
+}
+
+/* Стили для формы обновления количества */
+.cart .update-quantity-form {
+  display: inline-block;
+}
+
+.cart .update-quantity-form input {
+  width: 50px;
+  text-align: center;
+  margin-right: 5px;
+}
+
+/* Стили для кнопок */
+.cart .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.cart .btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.cart .btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.cart .btn-danger:hover {
+  background-color: #c82333;
+  border-color: #c82333;
+}
+
+/* Стили для итоговой строки */
+.cart .total td {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* Стили для формы купона */
+.cart .coupon-form {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.cart .coupon-form p {
+  margin-bottom: 10px;
+}
+
+.cart .coupon-form input {
+  width: 200px;
+  margin-right: 10px;
+}
+
+.cart .coupon-form .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.cart .coupon-form .btn-secondary:hover {
+  background-color: #545b62;
+  border-color: #4e555b;
+}
+
+/* Стили для ссылок "Продолжить покупки" и "Оформить заказ" */
+.cart .text-right a {
+  margin-left: 10px;
+}

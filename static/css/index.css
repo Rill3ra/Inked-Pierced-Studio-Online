@@ -1,0 +1,229 @@
+/* Общие стили */
+:root {
+  /* Цветовая палитра */
+  --primary-color: #007bff;
+  --secondary-color: #f8f9fa;
+  --text-color: #333;
+  --link-color: #007bff;
+  --background-color: #fff;
+
+  /* Типография */
+  --base-font-family: sans-serif;
+  --base-font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--base-font-family);
+  font-size: var(--base-font-size);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Стили для шапки (header) */
+.site-header { /* Изменено имя класса */
+  background-color: var(--secondary-color); /* Использование переменной */
+  padding: 10px 0;
+  position: relative;
+}
+
+.site-header__container { /* Изменено имя класса */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.site-header__logo { /* Изменено имя класса */
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.site-header__logo img { /* Изменено имя класса */
+  width: 50px;
+  margin-right: 10px;
+}
+
+.site-header__logo-text { /* Изменено имя класса */
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Стили для навигации */
+.main-navigation__list { /* Изменено имя класса */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.main-navigation__item { /* Изменено имя класса */
+  margin-left: 20px;
+}
+
+.main-navigation__link { /* Изменено имя класса */
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: bold;
+}
+
+.main-navigation__link:hover { /* Изменено имя класса */
+  color: var(--link-color); /* Использование переменной */
+}
+
+/* Стили для кнопки меню (для мобильных) */
+/* ... */
+
+/* Стили для мобильной навигации (Offcanvas) */
+/* ... */
+
+/* Стили для поиска */
+/* ... */
+
+/* Стили для основного контента (main) */
+main {
+  padding: 20px;
+  min-height: calc(100vh - 150px);
+}
+
+footer {
+  background-color: #f0f0f0;
+  padding: 20px 0;
+  font-family: sans-serif;
+
+    .footer__container {
+    max-width: 1200px; /*Adjust as needed*/
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /*Distribute sections evenly*/
+  }
+
+  .footer__section {
+    width: 20%; /* Adjust as needed depending on number of sections and desired look */
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      width: 45%; /* Two columns on smaller screens */
+    }
+
+    @media (max-width: 576px) {
+      width: 100%; /* Full width on very small screens */
+    }
+  }
+
+  .footer__title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .footer__link_2 {
+    text-decoration: none;
+    color: #333;
+
+    &:hover {
+      color: aqua; /* Изменяем цвет при наведении */
+      text-decoration: none;
+    }
+  }  
+
+  .footer__description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+  }
+
+  .footer__link {
+    color: #a8a9aa;
+    text-decoration: none; /* Убираем подчеркивание */
+
+    &:hover {
+      color: #0056b3; /* Изменяем цвет при наведении */
+      text-decoration: none; /* Убираем подчеркивание при наведении (если было) */
+    }
+  }
+
+  .footer__social {
+    display: flex;
+    gap: 10px;
+    color: #000;
+  }
+
+  .footer__social-link {
+    color: #000000;
+    font-size: 1.2rem;
+
+    &:hover {
+      color: #007bff; /* Изменяем цвет при наведении */
+    }
+  }
+
+  .footer__nav {
+    /* стили для навигации, если нужно */
+  }
+
+  .footer__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer__list-item {
+    margin-bottom: 5px;
+  }
+
+  .footer__subsection {
+    /* стили для подразделов, если нужно */
+  }
+
+  .footer__text {
+    color: #555;
+  }
+
+  .footer__copyright {
+    text-align: center;
+    margin-top: 20px;
+    color: #000000;
+    width: 100%; /*Make sure it spans the whole width*/
+    font-size: 0.8rem;
+  }
+}
+
+/* Адаптивность (для мобильных устройств) */
+@media (max-width: 768px) {
+    .footer {
+        padding: 10px 0; /* Меньше отступов на маленьких экранах */
+    }
+
+    .footer__logo-container {
+        text-align: center; /* Центрируем логотип на мобильных */
+    }
+
+    .footer__sections,
+    .footer__content {
+        text-align: center; /* Центрируем разделы и контент */
+        margin-top: 10px;
+    }
+
+    .footer__social {
+        justify-content: center; /* Выравниваем иконки по центру */
+    }
+}
+/*  Медиа-запрос для десктопов (ширина экрана больше 992px)  */
+@media (min-width: 992px) {
+    .container-fluid {
+        width: 50%; /*  Занимает половину экрана  */
+        margin: 0 auto; /*  Центрирование по горизонтали  */
+    }
+}
+
+/*  Медиа-запрос для больших десктопов (ширина экрана больше 1200px)  */
+@media (min-width: 1200px) {
+    .container-fluid {
+        width: 1200px; /*  Фиксированная ширина для больших экранов  */
+    }
+}

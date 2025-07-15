@@ -1,0 +1,76 @@
+/* Стили для страницы детальной информации о продукте */
+.product-detail-container {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-container {
+    width: 300px;
+    margin-right: 20px;
+}
+
+.product-detail-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.product-info {
+    flex-grow: 1;
+    padding-left: 20px;
+}
+
+.product-description {
+    margin-bottom: 15px;
+}
+
+.product-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #007bff; /* Пример цвета */
+    margin-bottom: 10px;
+}
+
+.product-availability {
+    margin-bottom: 10px;
+}
+
+.in-stock {
+    color: green;
+    font-weight: bold;
+}
+
+.out-of-stock {
+    color: red;
+    font-weight: bold;
+}
+
+.back-to-category {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+/* Стили для кнопки "Добавить в корзину" */
+.add-to-cart-button {
+    padding: 10px 20px;
+    background-color: #28a745; /* Пример цвета */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease; /* Плавный эффект при наведении */
+}
+
+.add-to-cart-button:hover {
+    background-color: #218838; /*  Более темный цвет при наведении */
+}

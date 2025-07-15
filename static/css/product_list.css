@@ -1,0 +1,310 @@
+/* Общие стили */
+/* (Эти стили можно вынести в base.css, если вы хотите, чтобы они применялись ко всем страницам) */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333; /* Цвет текста по умолчанию */
+}
+
+/* Стили для формы поиска */
+form {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center; /* Выравниваем элементы по вертикали */
+}
+
+.search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    flex-grow: 1;
+    font-size: 1em; /* Размер шрифта для поля ввода */
+}
+
+.search-button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em; /* Размер шрифта для кнопки */
+}
+
+/* Стили для страницы списка продуктов */
+.products-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    text-align: center; /* Центрируем заголовок */
+}
+
+.category-list {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+.category-list h2 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.category-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex; /*  Включаем flexbox */
+    flex-wrap: wrap; /*  Разрешаем перенос элементов на новую строку */
+    justify-content: flex-start; /* Выравниваем элементы по левому краю */
+}
+
+.category-list li {
+    width: 20%; /*  Занимает 20% ширины контейнера (100% / 5) */
+    box-sizing: border-box; /* Включаем box-sizing для учета padding и border */
+    padding: 5px; /*  Добавляем отступы вокруг элементов */
+    margin-bottom: 5px; /* Убираем отступ снизу, т.к. он учитывается в padding */
+}
+
+.category-list a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    text-align: center; /* Центрируем текст в ячейке */
+}
+
+.category-list a:hover {
+    background-color: #f0f0f0;
+}
+
+/* Стили для product-grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6 колонок в ряд */
+    grid-gap: 20px; /* Отступы между ячейками */
+}
+
+.product-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s ease;
+    position: relative; /*  Относительное позиционирование для "Новинки" */
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+.product-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.product-price {
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.product-availability {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.in-stock {
+    color: green;
+    font-weight: bold;
+}
+
+.out-of-stock {
+    color: red;
+    font-weight: bold;
+}
+
+/* Стили для метки "Новинка" */
+.new-product {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ff4081; /* Пример цвета */
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    z-index: 1; /* Убедитесь, что метка выше других элементов */
+}
+
+/* Адаптивность (меньше колонок на маленьких экранах) */
+@media (max-width: 992px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 колонки на средних экранах */
+    }
+}
+
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 колонки на маленьких экранах */
+    }
+}
+
+@media (max-width: 576px) {
+    .product-grid {
+        grid-template-columns: 1fr; /* 1 колонка на очень маленьких экранах */
+    }
+}
+/* Стили для раздела сертификатов */
+.certificate-section {
+    margin-top: 30px;
+    text-decoration: none;
+}
+
+.certificate-section h2 {
+    margin-bottom: 15px;
+    font-size: 1.4em;
+    text-align: center; /* Центрируем заголовок */
+}
+
+.certificate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    text-decoration: none;
+}
+
+.certificate-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s ease; /* Добавляем эффект при наведении */
+    text-decoration: none;
+}
+
+.certificate-card:hover {
+    transform: translateY(-5px); /* Приподнимаем карточку при наведении */
+}
+
+.certificate-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-decoration: none;
+}
+
+.certificate_text {
+    text-decoration: none;
+}
+
+
+/* Стили для списка подкатегорий */
+.subcategory-list {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.subcategory-list h2 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.subcategory-list ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.subcategory-list li {
+    width: 33.33%; /* Три элемента в ряд */
+    box-sizing: border-box;
+    padding: 5px;
+}
+
+.subcategory-list a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.subcategory-list a:hover {
+    background-color: #f0f0f0;
+}
+
+/* Стили для формы фильтров */
+.filter-section {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.filter-section h2 {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.filter-group {
+    margin-bottom: 10px;
+}
+
+.filter-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.filter-section button[type="submit"] {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Стили для метки "Эксклюзив" */
+.exclusive {
+    color: #d84315;
+    font-weight: bold;
+    font-size: 0.9em;
+}
