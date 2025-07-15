@@ -1,0 +1,19 @@
+<!-- appointments/appointment_confirmation_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Подтверждение записи на прием</title>
+</head>
+<body>
+    <h1>Здравствуйте, {{ user.username }}!</h1>
+    <p>Спасибо за запись на прием.</p>
+    <p>Ваша запись:</p>
+    <ul>
+        <li><strong>Услуга:</strong> {{ appointment.service }}</li>
+        <li><strong>Дата:</strong> {{ appointment.date }}</li>
+        <li><strong>Время:</strong> {{ appointment.time }}</li>
+    </ul>
+    <p>Мы ждем вас!</p>
+</body>
+</html>

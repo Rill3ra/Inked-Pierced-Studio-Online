@@ -1,0 +1,25 @@
+<!-- templates/appointments/appointment_create.html -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Запись на прием{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Запись на прием</h2>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">Записаться</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,566 @@
+Отлично, давайте улучшим ваш код главной страницы и добавим функциональность записи по календарю и времени. Это потребует изменений в HTML, CSS, JavaScript и, самое главное, в коде Django (модели, представления, формы, шаблоны). Поскольку это большая задача, я предоставлю вам пошаговое руководство с примерами кода.
+
+Предварительные шаги (Django):
+
+Создайте приложение для записей (если его еще нет):
+
+bash
+
+python manage.py startapp appointments
+Добавьте приложение appointments в INSTALLED_APPS в вашем файле settings.py.
+
+Создайте модель для записей (appointments/models.py):
+
+python
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+class Appointment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments', verbose_name='Пользователь')
+    date = models.DateField(verbose_name='Дата')
+    time = models.TimeField(verbose_name='Время')
+    service = models.CharField(max_length=255, verbose_name='Услуга')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
+    notes = models.TextField(blank=True, verbose_name='Примечания')
+
+    def __str__(self):
+        return f"Запись: {self.service} - {self.date} {self.time}"
+
+    class Meta:
+        verbose_name = "Запись"
+        verbose_name_plural = "Записи"
+User: Связывает запись с пользователем.
+date, time: Дата и время записи.
+service: Услуга (например, “Пирсинг уха”, “Тату”).
+created_at: Дата и время создания записи.
+notes: Дополнительные примечания.
+Сделайте миграции и примените их:
+
+bash
+
+python manage.py makemigrations appointments
+python manage.py migrate
+Создайте форму для создания записей (appointments/forms.py):
+
+python
+
+from django import forms
+from .models import Appointment
+from django.core.exceptions import ValidationError
+
+class AppointmentForm(forms.ModelForm):
+    class Meta:
+        model = Appointment
+        fields = ['date', 'time', 'service', 'notes']  # Укажите нужные поля
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date = cleaned_data.get('date')
+        time = cleaned_data.get('time')
+
+        # Проверка на будущие записи (по желанию)
+        # if date and date < date.today():
+        #     raise ValidationError("Нельзя выбрать прошедшую дату.")
+
+        # Дополнительные проверки здесь, например, на доступность времени.
+        return cleaned_data
+Создайте представления (views) для отображения главной страницы, формы записи и обработки записи (appointments/views.py):
+
+python
+
+from django.shortcuts import render, redirect
+from .forms import AppointmentForm
+from django.contrib.auth.decorators import login_required # Для защиты от неавторизованных пользователей
+from django.contrib import messages  # Для отображения сообщений пользователю
+
+def home(request):
+    """Отображает главную страницу."""
+    return render(request, 'home.html')  # Создайте шаблон home.html позже
+
+@login_required  # Пользователь должен быть авторизован
+def make_appointment(request):
+    """Отображает форму записи и обрабатывает ее отправку."""
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)  # Не сохраняем сразу, чтобы добавить user
+            appointment.user = request.user
+            appointment.save()
+            messages.success(request, 'Запись успешно создана!')  # Сообщение об успехе
+            return redirect('home')  # Перенаправление на главную или другую страницу
+        else:
+            messages.error(request, 'Ошибка при создании записи. Пожалуйста, проверьте данные.')  # Сообщение об ошибке
+    else:
+        form = AppointmentForm()
+    return render(request, 'appointments/make_appointment.html', {'form': form})  # Создайте шаблон
+Создайте шаблоны:
+
+home.html (в templates/): Главная страница.
+html
+
+{% extends 'base.html' %}  <!-- Предполагаем, что у вас есть base.html -->
+{% block title %}Inked & Pierced Studio - Главная{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Добро пожаловать в Inked & Pierced Studio!</h1>
+            <p class="lead">Мы предлагаем широкий выбор украшений для пирсинга и прокола ушей.</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'products:product_list' %}" role="button">Перейти к товарам</a>
+            <a class="btn btn-success btn-lg" href="{% url 'appointments:make_appointment' %}" role="button">Записаться</a>  <!-- Кнопка записи -->
+        </div>
+    </div>
+{% endblock %}
+appointments/make_appointment.html (в templates/appointments/): Шаблон для формы записи.
+html
+
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}  <!-- Загрузите crispy_forms_tags, если используете crispy forms -->
+
+{% block title %}Запись на прием{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Запись на прием</h2>
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}  <!-- Используйте crispy для красивого отображения формы -->
+            <button type="submit" class="btn btn-primary">Записаться</button>
+        </form>
+    </div>
+{% endblock %}
+Настройте urls.py для приложения appointments (appointments/urls.py):
+
+python
+
+from django.urls import path
+from . import views
+
+app_name = 'appointments'  #  Определите пространство имен
+
+urlpatterns = [
+    path('make_appointment/', views.make_appointment, name='make_appointment'),
+]
+Подключите appointments.urls к основному urls.py вашего проекта:
+
+python
+
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),  # Для логина/логаута (если нужно)
+    path('', include('appointments.urls')), # Добавлено
+    path('products/', include('products.urls')),
+    path('blog/', include('blog.urls')), # Пример других приложений
+]
+
+
+**Изменения HTML для главной страницы (home.html):**
+
+*   В `home.html` (в вашем шаблоне `templates/home.html` или где находится главная страница) добавьте ссылку или кнопку для перехода к форме записи.
+*   Я уже добавил кнопку "Записаться" в примере выше.
+
+**CSS (необходимые изменения):**
+
+*   Для отображения календаря и формы записи потребуется CSS.  Я рекомендую использовать библиотеку для календаря, такую как FullCalendar или просто использовать базовые стили Bootstrap.
+
+**Изменения JavaScript:**
+
+*   Вам потребуется JavaScript для отображения календаря, выбора даты и времени, а также, возможно, для динамической загрузки информации о доступности времени (если вы хотите предотвратить выбор занятого времени).
+*   Я предоставлю примеры использования FullCalendar позже.
+
+**Детализированные шаги и код:**
+
+**1.  Установка `django-crispy-forms` (для красивого отображения форм):**
+
+```bash
+pip install django-crispy-forms
+Добавьте 'crispy_forms' и 'crispy_bootstrap5' в INSTALLED_APPS в settings.py:
+
+python
+
+INSTALLED_APPS = [
+    # ...
+    'crispy_forms',
+    'crispy_bootstrap5',  # Или другой подходящий шаблон
+    'appointments',
+    # ...
+]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"  # Или используйте другой пакет
+CRISPY_TEMPLATE_PACK = "bootstrap5"  # Выберите пакет Bootstrap
+2. Шаблон appointments/make_appointment.html (с использованием Crispy Forms и Bootstrap):
+
+html
+
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Запись на прием{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Запись на прием</h2>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}  <!-- Используйте crispy для красивого отображения формы -->
+            <button type="submit" class="btn btn-primary">Записаться</button>
+        </form>
+    </div>
+{% endblock %}
+3. Добавление календаря (пример с использованием FullCalendar):
+
+Установите FullCalendar:
+
+bash
+
+npm install --save @fullcalendar/core @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
+Включите FullCalendar в ваш base.html или в шаблон формы записи:
+
+html
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Inked & Pierced Studio{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <!-- FullCalendar CSS -->
+    <link href='{% static "fullcalendar/core/main.css" %}' rel='stylesheet' />
+    <link href='{% static "fullcalendar/daygrid/main.css" %}' rel='stylesheet' />
+    <link href='{% static "fullcalendar/timegrid/main.css" %}' rel='stylesheet' />
+    <!-- Your custom styles -->
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand header__logo" href="{% url 'home' %}">
+                    <img src="" alt="Логотип Inked & Pierced Studio">
+                    <span class="header__logo-text">Inked & Pierced Studio</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Inked & Pierced</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'products:product_list' %}">Products</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'blog:post_list' %}">Blog</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about' %}">About</a>
+                            </li>
+
+                            {% if user.is_authenticated %}
+                                 <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'cart:cart_detail' %}">Cart</a>
+                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'users:profile' %}">Profile</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'users:logout' %}">Logout</a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                     <a class="nav-link" href="{% url 'cart:cart_detail' %}">Cart</a>
+                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'users:register' %}">Register</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'users:login' %}">Login</a>
+                                </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+            <!-- Your content goes here -->
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="footer__logo-container">
+                    <a class="footer__logo" href="{% url 'home' %}">
+                        <img src="" alt="Логотип Inked & Pierced Studio">
+                        <span class="footer__logo-text">Inked & Pierced Studio</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="footer__sections">
+                    <h4>Разделы</h4>
+                    <ul>
+                        <li><a href="{% url 'products:product_list' %}">Продукты</a></li>
+                        <li><a href="{% url 'blog:post_list' %}">Блог</a></li>
+                        <li><a href="{% url 'about' %}">О нас</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="footer__content">
+                    <div class="footer__contacts">
+                        <h4>Контакты</h4>
+                        <p><a href="mailto:info@inkedandpierced.com">info@inkedandpierced.com</a></p>
+                        <p>+1 (555) 123-4567</p>
+                    </div>
+                    <div class="footer__social">
+                        <a href="#" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" target="_blank" aria-label="Telegram"><i class="bi bi-telegram"></i></a>
+                        <a href="#" target="_blank" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" target="_blank" aria-label="GitHub"><i class="bi bi-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer__copyright">
+            <p>&copy; {% now "Y" %} Inked & Pierced Studio. Все права защищены.</p>
+        </div>
+    </div>
+</footer>
+    <!-- Bootstrap JS (at the end of the body) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyv1M62uD7N4j3x5b1f0qg9GfP2Ww7p2N3wP7t4" crossorigin="anonymous"></script>
+    <!-- FullCalendar JS (at the end of the body) -->
+    <script src='{% static "fullcalendar/core/main.js" %}'></script>
+    <script src='{% static "fullcalendar/daygrid/main.js" %}'></script>
+    <script src='{% static "fullcalendar/timegrid/main.js" %}'></script>
+    <script src='{% static "fullcalendar/interaction/main.js" %}'></script>
+
+    <!-- Your custom script -->
+    <script src="{% static 'js/test.js' %}"></script>
+</body>
+</html>
+Создайте папку fullcalendar в static/: Поместите файлы FullCalendar CSS и JS в эту папку.
+
+В вашем шаблоне appointments/make_appointment.html добавьте div для календаря:
+
+html
+
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Запись на прием{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Запись на прием</h2>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div id="calendar-container">
+            <div id="calendar"></div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">Записаться</button>
+        </form>
+    </div>
+{% endblock %}
+Создайте файл static/js/test.js и добавьте следующий код для инициализации FullCalendar:
+javascript
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid', 'interaction' ], // Включите необходимые плагины
+        initialView: 'dayGridMonth', // Начальный вид календаря
+        locale: 'ru',  //  Локализация (если нужно)
+        events: [
+            // Здесь будут события (записи) из Django
+        ],
+        dateClick: function(info) {
+            // Обработка клика на дату (например, выбор даты для записи)
+            const selectedDate = info.dateStr;
+            // Заполните поле date в форме
+            document.querySelector('input[name="date"]').value = selectedDate;
+            console.log('Выбрана дата: ', selectedDate);
+        },
+    });
+    calendar.render();
+});
+Замените events: [] на получение данных с сервера. Вам потребуется создать API endpoint (представление) в Django, которое будет возвращать записи в формате JSON. Пример (appointments/views.py):
+python
+
+from django.http import JsonResponse
+from .models import Appointment
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+@login_required
+def get_appointments_json(request):
+    """Возвращает записи в формате JSON."""
+    appointments = Appointment.objects.filter(user=request.user)  # Фильтруем по текущему пользователю
+    data = []
+    for appointment in appointments:
+        data.append({
+            'title': appointment.service,
+            'start': appointment.date.isoformat(),
+            'end': f"{appointment.date.isoformat()}T{appointment.time.strftime('%H:%M:%S')}",
+            'description': appointment.notes,
+        })
+    return JsonResponse(data, safe=False)  # safe=False для обработки массива
+Обновите appointments/urls.py:
+python
+
+from django.urls import path
+from . import views
+
+app_name = 'appointments'
+
+urlpatterns = [
+    path('make_appointment/', views.make_appointment, name='make_appointment'),
+    path('get_appointments_json/', views.get_appointments_json, name='get_appointments_json'), #Добавлено
+]
+Измените ваш JavaScript (static/js/test.js) для загрузки данных о записях с сервера:
+javascript
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid', 'interaction' ],
+        initialView: 'dayGridMonth',
+        locale: 'ru',
+        events: function(fetchInfo, successCallback, failureCallback) {
+            // Загружаем события с сервера
+            fetch('{% url "appointments:get_appointments_json" %}')
+                .then(response => response.json())
+                .then(data => {
+                    successCallback(data); // Передаем события в календарь
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки событий:', error);
+                    failureCallback(); // Обработка ошибок
+                });
+        },
+        dateClick: function(info) {
+            const selectedDate = info.dateStr;
+            document.querySelector('input[name="date"]').value = selectedDate;
+            console.log('Выбрана дата: ', selectedDate);
+        },
+    });
+    calendar.render();
+});
+4. Добавьте поле “date” в форму:
+
+В вашем appointments/forms.py добавьте поле даты:
+
+python
+
+from django import forms
+from .models import Appointment
+
+class AppointmentForm(forms.ModelForm):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    class Meta:
+        model = Appointment
+        fields = ['date', 'time', 'service', 'notes']
+Добавлено date = forms.DateField(...): Создает поле даты.
+widget=forms.DateInput(attrs={'type': 'date'}): Отображает поле даты в виде HTML5-элемента input type="date". Это позволит пользователю выбирать дату с помощью встроенного виджета календаря.
+5. Добавьте поле “time” в форму:
+
+В вашем appointments/forms.py добавьте поле времени:
+
+python
+
+from django import forms
+from .models import Appointment
+
+class AppointmentForm(forms.ModelForm):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
+    class Meta:
+        model = Appointment
+        fields = ['date', 'time', 'service', 'notes']
+Добавлено time = forms.TimeField(...): Создает поле времени.
+widget=forms.TimeInput(attrs={'type': 'time'}): Отображает поле времени в виде HTML5-элемента input type="time".
+6. Обработка записи (обновление appointments/views.py):
+
+В вашем представлении make_appointment (appointments/views.py) вам нужно будет извлечь данные из формы, сохранить их в базу данных, и, возможно, перенаправить пользователя на другую страницу.
+
+python
+
+from django.shortcuts import render, redirect
+from .forms import AppointmentForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+@login_required
+def make_appointment(request):
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            appointment = form.save(commit=False)
+            appointment.user = request.user
+            appointment.save()
+            messages.success(request, 'Запись успешно создана!')
+            return redirect('home') #  Или на другую страницу
+        else:
+            messages.error(request, 'Ошибка при создании записи. Пожалуйста, проверьте данные.')
+    else:
+        form = AppointmentForm()
+    return render(request, 'appointments/make_appointment.html', {'form': form})
+7. Дополнительные улучшения (идеи):
+
+Проверка доступности времени: В форме AppointmentForm вы можете добавить валидацию, чтобы убедиться, что выбранное время доступно (нет других записей на это время).
+Отображение занятого времени: Вы можете динамически отображать занятое время на календаре. Например, загружать информацию о существующих записях с сервера и отображать их в FullCalendar.
+Уведомления: Добавьте систему уведомлений, чтобы уведомлять пользователей о предстоящих записях (например, по электронной почте).
+Разграничение прав доступа: Убедитесь, что только авторизованные пользователи могут создавать записи, и что они могут видеть только свои записи.
+Важные замечания и шаги:
+
+Установка библиотек: Убедитесь, что вы установили все необходимые библиотеки (FullCalendar, django-crispy-forms).
+Миграции: После изменения моделей, всегда запускайте python manage.py makemigrations и python manage.py migrate.
+Шаблоны: Убедитесь, что ваши шаблоны (home.html, appointments/make_appointment.html) существуют и правильно настроены.
+URL-адреса: Убедитесь, что ваши URL-адреса правильно настроены в urls.py.
+Отладка: Используйте инструменты разработчика браузера (F12) для отладки JavaScript и проверки ошибок. Проверяйте консоль, вкладку Network (для запросов к серверу) и вкладку Elements (для проверки HTML).
+Тестирование: Тщательно протестируйте все функции, включая создание, отображение и редактирование записей.
+Безопасность: Убедитесь, что вы защитили свои данные от уязвимостей (например, используйте CSRF-токены в формах).
+Этот подробный ответ предоставляет вам всю необходимую информацию для реализации системы записи по календарю и времени. Пожалуйста, следуйте инструкциям шаг за шагом и не стесняйтесь задавать вопросы, если у вас возникнут трудности.
