@@ -1,0 +1,25 @@
+<!-- templates/emails/order_confirmation.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение заказа</title>
+</head>
+<body>
+    <h1>Здравствуйте, {{ order.user.username }}!</h1>
+    <p>Ваш заказ №{{ order.id }} успешно оформлен!</p>
+    <p>Детали заказа:</p>
+    <ul>
+        {% for item in order.items.all %}
+            <li>{{ item.product.name }} - {{ item.quantity }} шт. - {{ item.price }}</li>
+        {% endfor %}
+    </ul>
+    <p>Имя: {{order.first_name}}</p>
+    <p>Фамилия: {{order.last_name}}</p>
+    <p>Email: {{order.email}}</p>
+    <p>Номер телефона: {{order.phone_number}}</p>
+    <p>Адрес доставки: {{order.shipping_address}}, {{order.city}}, {{order.postal_code}}, {{order.country}}</p>
+    <p>Сумма заказа: {{ order.get_total_cost }}</p>
+    <p>Спасибо за ваш заказ!</p>
+</body>
+</html>

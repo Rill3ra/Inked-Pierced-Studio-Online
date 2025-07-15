@@ -1,0 +1,21 @@
+{% extends 'base.html' %}  <!-- Предполагаем, что у вас есть base.html -->
+{% block title %}Inked & Pierced Studio - Главная{% endblock %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Добро пожаловать в Inked & Pierced Studio!</h1>
+            <p class="lead">Мы предлагаем широкий выбор украшений для пирсинга и прокола ушей.</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'products:product_list' %}" role="button">Перейти к товарам</a>
+            <a class="btn btn-success btn-lg" href="{% url 'appointments:appointment_create' %}" role="button">Записаться</a>  <!-- Кнопка записи -->
+        </div>
+        
+        <!--<div>
+            <nav>
+                <img src="{% static 'images/photo.jpg' %}" alt="Inked Pierced Studio" class="photo_1">
+            </nav>
+        </div>-->
+    </div>
+{% endblock %}
