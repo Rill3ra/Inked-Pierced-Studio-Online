@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1>Профиль пользователя</h1>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Редактировать профиль</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ user_form.as_p }}
+                    {{ avatar_form.as_p }}
+                    <button type="submit" class="btn btn-primary">Сохранить профиль</button>
+                </form>
+            </div>
+
+            <div class="col-md-6">
+                <h2>Сменить пароль</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="{{ password_form.old_password.id_for_label }}">Текущий пароль:</label>
+                        {{ password_form.old_password }}
+                        {% if password_form.old_password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in password_form.old_password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ password_form.new_password1.id_for_label }}">Новый пароль:</label>
+                        {{ password_form.new_password1 }}
+                        {% if password_form.new_password1.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in password_form.new_password1.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ password_form.new_password2.id_for_label }}">Подтвердите новый пароль:</label>
+                        {{ password_form.new_password2 }}
+                        {% if password_form.new_password2.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in password_form.new_password2.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сменить пароль</button>
+                </form>
+            </div>
+        </div>
+
+        <h2>Ваши записи</h2>
+        {% if appointments %}
+            <ul class="list-group">
+                {% for appointment in appointments %}
+                    <li class="list-group-item">
+                        <strong>Услуга:</strong> {{ appointment.service }}<br>
+                        <strong>Дата:</strong> {{ appointment.date }}<br>
+                        <strong>Время:</strong> {{ appointment.time }}<br>
+                        <strong>Примечания:</strong> {{ appointment.notes|default:"Нет примечаний" }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет записей.</p>
+        {% endif %}
+        <h2>Ваши заказы</h2>
+        {% if orders %}
+            <ul class="list-group">
+                {% for order in orders %}
+                    <li class="list-group-item">
+                        <strong>Номер заказа:</strong> {{ order.id }}<br>
+                        <strong>Дата заказа:</strong> {{ order.created_at }}<br>
+                        <strong>Итоговая стоимость:</strong> {{ order.get_total_cost }} руб.<br>
+                        <a href="{% url 'orders:order_detail' order.id %}">Подробнее</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет заказов.</p>
+        {% endif %}
+    </div>
+{% endblock %}
