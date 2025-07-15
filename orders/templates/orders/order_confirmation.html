@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Заказ успешно оформлен!</h1>
+    <p>Ваш номер заказа: <strong>{{ order.id }}</strong></p>
+    <p>Общая стоимость: <strong>{{ order.get_total_cost }}</strong></p>
+
+    <h2>Состав заказа:</h2>
+    <ul>
+        {% for item in order.items.all %}
+            <li>
+                {{ item.product.name }} ({{ item.quantity }} шт.) - {{ item.get_cost }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p>Адрес доставки: {{ order.shipping_address }}, {{ order.city }}, {{ order.postal_code }}, {{ order.country }}</p>
+
+    <p>Спасибо за ваш заказ!</p>
+
+    <a href="{% url 'home' %}">Вернуться в магазин</a>
+{% endblock %}
