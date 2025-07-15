@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+    <h1>Ваша корзина</h1>
+    <div class="cart">
+        {% if cart %}
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Изображение</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">Цена за шт.</th>
+                    <th scope="col">Цена</th>
+                    <th scope="col">Скидка</th>
+                    <th scope="col">Цена со скидкой</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in cart %}
+                    <tr>
+                        <td>
+                            {% if item.product %}
+                                <a href="{{ item.product.get_absolute_url }}">
+                                    <img src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}"
+                                         alt="{{ item.product.name }}" width="100">
+                                </a>
+                            {% elif item.certificate %}
+                                <img src="{% if item.certificate.image %}{{ item.certificate.image.url }}{% else %}{% static 'img/no_image.png' %}{% endif %}"
+                                     alt="{{ item.certificate.name }}" width="100">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.product %}
+                                {{ item.product.name }}
+                            {% elif item.certificate %}
+                                {{ item.certificate.name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.product %}
+                                <form action="{% url 'cart:cart_update' item.product.id %}" method="post" class="update-quantity-form">
+                                    {{ item.update_quantity_form.as_p }}
+                                    <button type="submit" class="btn btn-primary">Обновить</button>
+                                    {% csrf_token %}
+                                </form>
+                            {% else %}
+                                {{ item.quantity }}
+                            {% endif %}
+                        </td>
+                        <td>{{ item.price }} руб.</td>
+                        <td>{{ item.total_price }} руб.</td>
+                        <td>{{ item.discount|floatformat:2 }} руб.</td>
+                        <td>{{ item.total_price_after_discount|floatformat:2 }} руб.</td>
+                        <td>
+                            {% if item.product %}
+                                <form method="post" action="{% url 'cart:cart_remove' item.product.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                </form>
+                            {% elif item.certificate %}
+                                <form method="post" action="{% url 'cart:cart_remove' item.certificate.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr class="total">
+                    <td>Итого</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td id="cart-total-price">{{ cart.get_total_price|floatformat:2 }} руб.</td>
+                    <td id="cart-total-discount">{{ cart.get_discount|floatformat:2 }} руб.</td>
+                    <td id="cart-total-after-discount">{{ cart.get_total_price_after_discount|floatformat:2 }} руб.</td>
+                    <td></td>
+                </tr>
+                {% if cart.coupon %}
+                    <tr>
+                        <td colspan="8">Купон "{{ cart.coupon.code }}" применен. Скидка {{ cart.coupon.discount }}%</td>
+                    </tr>
+                {% endif %}
+                </tfoot>
+            </table>
+
+            <div class="coupon-form">
+                <p>Применить купон:</p>
+                <form action="{% url 'coupons:coupon_apply' %}" method="post">
+                    {{ coupon_apply_form.as_p }}
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">Применить</button>
+                </form>
+            </div>
+
+            <p class="text-right">
+                <a href="{% url 'products:product_list' %}" class="btn btn-primary">Продолжить покупки</a>
+                <a href="{% url 'orders:checkout' %}" class="btn btn-success">Оформить заказ</a>
+            </p>
+        {% else %}
+            <p>Ваша корзина пуста.</p>
+            <p><a href="{% url 'products:product_list' %}">Перейти к покупкам</a></p>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Обработчик для обновления количества товара
+            $('.update-quantity-form').submit(function(event) {
+                event.preventDefault(); // Предотвращаем отправку формы по умолчанию
+                var form = $(this);
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function(data) {
+                        // Обновляем итоговые значения на странице
+                        $('#cart-total-price').text(data.total_price + ' руб.');
+                        $('#cart-total-discount').text(data.discount + ' руб.');
+                        $('#cart-total-after-discount').text(data.total_after_discount + ' руб.');
+                    },
+                    error: function(data) {
+                        alert('Ошибка при обновлении корзины.');
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

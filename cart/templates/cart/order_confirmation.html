@@ -1,0 +1,15 @@
+{# checkout/templates/checkout/order_confirmation.html #}
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Здравствуйте, {{ order.user.username }}!</h1>
+<p>Ваш заказ №{{ order.id }} успешно оформлен и оплачен.</p>
+<p>Состав заказа:</p>
+<ul>
+  {% for item in order.orderitem_set.all %}
+  <li>{{ item.product.name }} - {{ item.quantity }} шт. - {{ item.price }}</li>
+  {% endfor %}
+  </ul>
+  <p>Сумма заказа: {{ order.total_price }}</p>
+  <p>Спасибо за ваш заказ!</p>
+{% endblock %}
